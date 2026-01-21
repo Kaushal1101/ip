@@ -11,6 +11,7 @@ public abstract class Task {
         this.marked = val;
     }
 
+
     public String toString() {
         String cross = marked ? "X" : " ";
         return "[" + cross + "] " + description;
