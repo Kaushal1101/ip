@@ -39,7 +39,7 @@ public class Greg {
                     int index = Integer.parseInt(line.split(" ")[1]) - 1;
 
                     if (index >= counter || index < 0) {
-                        throw new GregException("Invalid task selected to mark/unmark.");
+                        throw new GregException("Invalid task selected to delete.");
                     } else {
                         String deletedTask = tasks.get(index).toString();
                         tasks.remove(index);
