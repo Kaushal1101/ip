@@ -1,12 +1,21 @@
+import javax.sound.midi.SysexMessage;
+import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Greg {
     private static final String LINE =
             "____________________________________________________________\n";
+
     public static void main(String[] args) {
         int MAX = 100;
+        Scanner scanner = new Scanner(System.in);
+        int counter = 0;
+
+        Storage storage = new Storage("data/greg.txt");
+        ArrayList<Task> tasks = initializeTasks(storage);
 
         String myIntro = LINE +
                 "Hello! I'm Greg\n" +
@@ -18,11 +27,6 @@ public class Greg {
 
         System.out.println(myIntro);
 
-        Scanner scanner = new Scanner(System.in);
-
-        // Task[] tasks = new Task[MAX];
-        ArrayList<Task> tasks = new ArrayList<>();
-        int counter = 0;
 
         while (true) {
             String line = scanner.nextLine().trim();
@@ -30,6 +34,7 @@ public class Greg {
             try {
                 if (line.equals("bye")) {
                     // To exit the program
+                    saveTasks(storage, tasks);
                     System.out.println(myOutro);
                     scanner.close();
                     break;
@@ -38,11 +43,12 @@ public class Greg {
                     // To delete a task
                     int index = Integer.parseInt(line.split(" ")[1]) - 1;
 
-                    if (index >= counter || index < 0) {
+                    if (index >= tasks.size() || index < 0) {
                         throw new GregException("Invalid task selected to delete.");
                     } else {
                         String deletedTask = tasks.get(index).toString();
                         tasks.remove(index);
+                        saveTasks(storage, tasks);
                         counter--;
                         System.out.println("Noted. I've removed this task: \n" + deletedTask + "\n" + "Now you have " + counter + " tasks in the list.\n" + LINE);
                     }
@@ -54,7 +60,8 @@ public class Greg {
                     int index = Integer.parseInt(line.split(" ")[1]) - 1;
 
                     // Equal is also error because counter holds index for next task to be inserted
-                    if (index >= counter || index < 0) {
+                    if (index >= tasks.size() || index < 0) {
+                        System.out.println("Counter: " + counter);
                         throw new GregException("Invalid task selected to mark/unmark.");
                     } else if (line.startsWith("mark")) {
                         tasks.get(index).mark(true);
@@ -63,6 +70,9 @@ public class Greg {
                         tasks.get(index).mark(false);
                         System.out.println(" OK, I've marked this task as not done yet: \n" + tasks.get(index).toString() + "\n" + LINE);
                     }
+
+                    // Save marked/unmarked task
+                    saveTasks(storage, tasks);
 
                 } else if (line.equals("list")){
                     // To list task items
@@ -74,6 +84,7 @@ public class Greg {
                 } else {
                     Task task = createTask(line);
                     tasks.add(task);
+                    saveTasks(storage, tasks);
                     counter++;
 
                     System.out.println("Got it. I've added this task: \n" + task.toString() + "\n" + "Now you have " + counter + " tasks in the list.\n" + LINE);
@@ -123,6 +134,23 @@ public class Greg {
             return new Todo(description);
         } else {
             throw new GregException("Invalid task, must be either 'todo', 'event', or 'deadline' task with a description");
+        }
+    }
+
+    private static ArrayList<Task> initializeTasks(Storage storage) {
+        try {
+            return storage.loadAll();
+        } catch (GregException e) {
+            System.out.println("Warning: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    private static void saveTasks(Storage storage, ArrayList<Task> tasks) {
+        try {
+            storage.saveAll(tasks);
+        } catch (GregException e) {
+            System.out.println("Warning: " + e.getMessage());
         }
     }
 }
