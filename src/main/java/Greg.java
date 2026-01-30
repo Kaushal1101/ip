@@ -12,7 +12,6 @@ public class Greg {
     public static void main(String[] args) {
         int MAX = 100;
         Scanner scanner = new Scanner(System.in);
-        int counter = 0;
 
         Storage storage = new Storage("data/greg.txt");
         ArrayList<Task> tasks = initializeTasks(storage);
@@ -49,8 +48,7 @@ public class Greg {
                         String deletedTask = tasks.get(index).toString();
                         tasks.remove(index);
                         saveTasks(storage, tasks);
-                        counter--;
-                        System.out.println("Noted. I've removed this task: \n" + deletedTask + "\n" + "Now you have " + counter + " tasks in the list.\n" + LINE);
+                        System.out.println("Noted. I've removed this task: \n" + deletedTask + "\n" + "Now you have " + tasks.size() + " tasks in the list.\n" + LINE);
                     }
 
                 } else if (line.startsWith("mark ") || line.startsWith("unmark ")){
@@ -61,7 +59,6 @@ public class Greg {
 
                     // Equal is also error because counter holds index for next task to be inserted
                     if (index >= tasks.size() || index < 0) {
-                        System.out.println("Counter: " + counter);
                         throw new GregException("Invalid task selected to mark/unmark.");
                     } else if (line.startsWith("mark")) {
                         tasks.get(index).mark(true);
@@ -85,9 +82,8 @@ public class Greg {
                     Task task = createTask(line);
                     tasks.add(task);
                     saveTasks(storage, tasks);
-                    counter++;
 
-                    System.out.println("Got it. I've added this task: \n" + task.toString() + "\n" + "Now you have " + counter + " tasks in the list.\n" + LINE);
+                    System.out.println("Got it. I've added this task: \n" + task.toString() + "\n" + "Now you have " + tasks.size() + " tasks in the list.\n" + LINE);
                 }
             } catch (GregException e) {
                 System.out.println(e.getMessage());
