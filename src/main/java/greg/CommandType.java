@@ -1,3 +1,5 @@
+package greg;
+
 public enum CommandType {
     BYE,
     LIST,

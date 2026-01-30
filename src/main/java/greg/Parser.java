@@ -1,3 +1,5 @@
+package greg;
+
 public class Parser {
 
     public static ParsedCommand parse(String input) throws GregException {

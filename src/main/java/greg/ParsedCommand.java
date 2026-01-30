@@ -1,3 +1,5 @@
+package greg;
+
 public class ParsedCommand {
     public CommandType type;
 
