@@ -94,43 +94,47 @@ public class Greg {
 
     private static Task createTask(String input) throws GregException {
 
+        if (input.startsWith("todo ")) {
+            String description = input.substring(5).trim();
+            return new Todo(description);
+        }
+
         if (input.startsWith("deadline ")) {
-            String rest = input.substring(9).trim();
+            String rest = input.substring(9).trim(); // "<desc> /by <date [time]>"
             String[] parts = rest.split("/by", 2);
 
-            String description = parts[0].trim();
-            String by = parts.length > 1 ? parts[1].trim() : "";
-
-            return new Deadline(description, by);
-
-        } else if (input.startsWith("event ")) {
-            String rest = input.substring(6).trim();
-            String[] parts = rest.split("/", 3);
-
-            String description = parts[0].trim();
-
-            String from = parts.length > 1 ? parts[1].trim() : "";
-            if (from.startsWith("from")) {
-                from = from.substring(4).trim(); // remove "from"
+            if (parts.length < 2) {
+                throw new GregException("Invalid deadline format. Use: deadline <desc> /by yyyy-mm-dd [HHmm]");
             }
 
-            String to = parts.length > 2 ? parts[2].trim() : "";
-            if (to.startsWith("to")) {
-                to = to.substring(2).trim(); // remove "to"
-            }
+            String description = parts[0].trim();
+            String byRaw = parts[1].trim();
 
-            return new Event(description, from, to);
-
-        } else if (input.startsWith("todo ")) {
-            // default: todo
-            String description = input.startsWith("todo ")
-                    ? input.substring(5).trim()
-                    : input.trim();
-
-            return new Todo(description);
-        } else {
-            throw new GregException("Invalid task, must be either 'todo', 'event', or 'deadline' task with a description");
+            return new Deadline(description, byRaw);
         }
+
+        if (input.startsWith("event ")) {
+            String rest = input.substring(6).trim(); // "<desc> /from ... /to ..."
+
+            String[] fromSplit = rest.split("/from", 2);
+            if (fromSplit.length < 2) {
+                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
+            }
+
+            String description = fromSplit[0].trim();
+
+            String[] toSplit = fromSplit[1].trim().split("/to", 2);
+            if (toSplit.length < 2) {
+                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
+            }
+
+            String fromRaw = toSplit[0].trim();
+            String toRaw = toSplit[1].trim();
+
+            return new Event(description, fromRaw, toRaw);
+        }
+
+        throw new GregException("Invalid task. Must start with todo, deadline, or event.");
     }
 
     private static ArrayList<Task> initializeTasks(Storage storage) {
