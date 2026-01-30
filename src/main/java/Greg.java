@@ -1,156 +1,105 @@
-import javax.sound.midi.SysexMessage;
-import java.lang.reflect.Array;
-import java.security.GeneralSecurityException;
-import java.util.List;
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Greg {
-    private static final String LINE =
-            "____________________________________________________________\n";
 
-    public static void main(String[] args) {
-        int MAX = 100;
-        Scanner scanner = new Scanner(System.in);
+    private final Ui ui;
+    private final Storage storage;
+    private final TaskList taskList;
 
-        Storage storage = new Storage("data/greg.txt");
-        ArrayList<Task> tasks = initializeTasks(storage);
+    public Greg(String filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(filePath);
 
-        String myIntro = LINE +
-                "Hello! I'm Greg\n" +
-                "What can I do for you?\n" + LINE;
+        List<Task> loadedTasks;
+        try {
+            loadedTasks = storage.loadAll();
+        } catch (GregException e) {
+            ui.showWarning(e.getMessage());
+            loadedTasks = new ArrayList<>();
+        }
 
-        String myOutro = LINE +
-                " Bye. Hope to see you again soon!\n" +
-                LINE;
+        this.taskList = new TaskList(loadedTasks);
+    }
 
-        System.out.println(myIntro);
-
+    public void run() {
+        ui.showWelcome();
 
         while (true) {
-            String line = scanner.nextLine().trim();
-            System.out.println(LINE);
+            String input = ui.readCommand();
+            ui.showLine();
+
             try {
-                if (line.equals("bye")) {
-                    // To exit the program
-                    saveTasks(storage, tasks);
-                    System.out.println(myOutro);
-                    scanner.close();
-                    break;
+                ParsedCommand cmd = Parser.parse(input);
 
-                } else if (line.startsWith("delete ")) {
-                    // To delete a task
-                    int index = Integer.parseInt(line.split(" ")[1]) - 1;
+                switch (cmd.type) {
 
-                    if (index >= tasks.size() || index < 0) {
-                        throw new GregException("Invalid task selected to delete.");
-                    } else {
-                        String deletedTask = tasks.get(index).toString();
-                        tasks.remove(index);
-                        saveTasks(storage, tasks);
-                        System.out.println("Noted. I've removed this task: \n" + deletedTask + "\n" + "Now you have " + tasks.size() + " tasks in the list.\n" + LINE);
+                    case BYE:
+                        storage.saveAll(taskList.getAll());
+                        ui.showGoodbye();
+                        ui.close();
+                        return;
+
+                    case LIST:
+                        ui.showTaskList(taskList.getAll());
+                        break;
+
+                    case MARK: {
+                        Task task = taskList.mark(cmd.index);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskMarked(task);
+                        break;
                     }
 
-                } else if (line.startsWith("mark ") || line.startsWith("unmark ")){
-                    // To mark/unmark list items
-
-                    // Minus one because list is 1 indexed, but array is 0 indexed
-                    int index = Integer.parseInt(line.split(" ")[1]) - 1;
-
-                    // Equal is also error because counter holds index for next task to be inserted
-                    if (index >= tasks.size() || index < 0) {
-                        throw new GregException("Invalid task selected to mark/unmark.");
-                    } else if (line.startsWith("mark")) {
-                        tasks.get(index).mark(true);
-                        System.out.println("Nice! I've marked this task as done: \n" + tasks.get(index).toString() + "\n" + LINE);
-                    } else {
-                        tasks.get(index).mark(false);
-                        System.out.println(" OK, I've marked this task as not done yet: \n" + tasks.get(index).toString() + "\n" + LINE);
+                    case UNMARK: {
+                        Task task = taskList.unmark(cmd.index);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskUnmarked(task);
+                        break;
                     }
 
-                    // Save marked/unmarked task
-                    saveTasks(storage, tasks);
-
-                } else if (line.equals("list")){
-                    // To list task items
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + ". " + tasks.get(i).toString());
+                    case DELETE: {
+                        Task task = taskList.delete(cmd.index);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskDeleted(task.toString(), taskList.size());
+                        break;
                     }
-                    System.out.println("\n" + LINE);
 
-                } else {
-                    Task task = createTask(line);
-                    tasks.add(task);
-                    saveTasks(storage, tasks);
+                    case TODO: {
+                        Task task = new Todo(cmd.description);
+                        taskList.add(task);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskAdded(task, taskList.size());
+                        break;
+                    }
 
-                    System.out.println("Got it. I've added this task: \n" + task.toString() + "\n" + "Now you have " + tasks.size() + " tasks in the list.\n" + LINE);
+                    case DEADLINE: {
+                        Task task = new Deadline(cmd.description, cmd.byRaw);
+                        taskList.add(task);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskAdded(task, taskList.size());
+                        break;
+                    }
+
+                    case EVENT: {
+                        Task task = new Event(cmd.description, cmd.fromRaw, cmd.toRaw);
+                        taskList.add(task);
+                        storage.saveAll(taskList.getAll());
+                        ui.showTaskAdded(task, taskList.size());
+                        break;
+                    }
+
+                    default:
+                        throw new GregException("Unknown command.");
+
                 }
             } catch (GregException e) {
-                System.out.println(e.getMessage());
-                System.out.println(LINE);
+                ui.showError(e.getMessage());
             }
         }
     }
 
-    private static Task createTask(String input) throws GregException {
-
-        if (input.startsWith("todo ")) {
-            String description = input.substring(5).trim();
-            return new Todo(description);
-        }
-
-        if (input.startsWith("deadline ")) {
-            String rest = input.substring(9).trim(); // "<desc> /by <date [time]>"
-            String[] parts = rest.split("/by", 2);
-
-            if (parts.length < 2) {
-                throw new GregException("Invalid deadline format. Use: deadline <desc> /by yyyy-mm-dd [HHmm]");
-            }
-
-            String description = parts[0].trim();
-            String byRaw = parts[1].trim();
-
-            return new Deadline(description, byRaw);
-        }
-
-        if (input.startsWith("event ")) {
-            String rest = input.substring(6).trim(); // "<desc> /from ... /to ..."
-
-            String[] fromSplit = rest.split("/from", 2);
-            if (fromSplit.length < 2) {
-                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
-            }
-
-            String description = fromSplit[0].trim();
-
-            String[] toSplit = fromSplit[1].trim().split("/to", 2);
-            if (toSplit.length < 2) {
-                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
-            }
-
-            String fromRaw = toSplit[0].trim();
-            String toRaw = toSplit[1].trim();
-
-            return new Event(description, fromRaw, toRaw);
-        }
-
-        throw new GregException("Invalid task. Must start with todo, deadline, or event.");
-    }
-
-    private static ArrayList<Task> initializeTasks(Storage storage) {
-        try {
-            return storage.loadAll();
-        } catch (GregException e) {
-            System.out.println("Warning: " + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks) {
-        try {
-            storage.saveAll(tasks);
-        } catch (GregException e) {
-            System.out.println("Warning: " + e.getMessage());
-        }
+    public static void main(String[] args) {
+        new Greg("data/greg.txt").run();
     }
 }
