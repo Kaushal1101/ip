@@ -1,8 +1,11 @@
+package greg;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Storage {
@@ -12,7 +15,7 @@ public class Storage {
         this.file = new File(filePath);
     }
 
-    public void saveAll(ArrayList<Task> tasks) throws GregException {
+    public void saveAll(List<Task> tasks) throws GregException {
         ensureFileExists();
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
@@ -24,10 +27,10 @@ public class Storage {
         }
     }
 
-    public ArrayList<Task> loadAll() throws GregException {
+    public List<Task> loadAll() throws GregException {
         ensureFileExists();
 
-        ArrayList<Task> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine().trim();
