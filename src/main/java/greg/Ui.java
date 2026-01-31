@@ -82,6 +82,16 @@ public class Ui {
         System.out.print(LINE);
     }
 
+    /* ========== FIND RESULTS ========= */
+    public void showFindResults(List<Task> matches) {
+        System.out.println(LINE);
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            System.out.println((i + 1) + ". " + matches.get(i));
+        }
+        System.out.println(LINE);
+    }
+
     /* ========== ERRORS / WARNINGS ========== */
 
     public void showError(String message) {

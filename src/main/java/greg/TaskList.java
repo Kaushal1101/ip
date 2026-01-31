@@ -63,4 +63,20 @@ public class TaskList {
 
         return idx;
     }
+
+    public List<Task> find(String query) {
+        String[] terms = query.trim().toLowerCase().split("\\s+");
+        List<Task> matches = new ArrayList<>();
+
+        for (Task t : tasks) {
+            String hay = t.getDescription().toLowerCase(); // you may need to add getter
+            for (String term : terms) {
+                if (!term.isEmpty() && hay.contains(term)) {
+                    matches.add(t);
+                    break; // OR-match: any term
+                }
+            }
+        }
+        return matches;
+    }
 }

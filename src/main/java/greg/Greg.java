@@ -91,6 +91,12 @@ public class Greg {
                         break;
                     }
 
+                    case FIND: {
+                        List<Task> matches = taskList.find(cmd.description);
+                        ui.showFindResults(matches);
+                        break;
+                    }
+
                     default:
                         throw new GregException("Unknown command.");
 

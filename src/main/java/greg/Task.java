@@ -12,6 +12,10 @@ public abstract class Task {
         this.marked = false;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void mark(boolean val) {
         this.marked = val;
     }

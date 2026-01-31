@@ -70,6 +70,16 @@ public class Parser {
             return cmd;
         }
 
+        if (input.startsWith("find ")) {
+            String query = input.substring(5).trim();
+            if (query.isEmpty()) {
+                throw new GregException("Find command must have a search term.");
+            }
+            ParsedCommand cmd = new ParsedCommand(CommandType.FIND);
+            cmd.description = query;   // reuse description field
+            return cmd;
+        }
+
         throw new GregException("Invalid command.");
     }
 
