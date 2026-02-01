@@ -3,12 +3,23 @@ package greg;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entry point and main coordinator of the Greg task manager.
+ * <p>
+ * Wires together the UI, storage, task list, and parser, then runs the main command loop
+ * until the user exits.
+ */
 public class Greg {
 
     private final Ui ui;
     private final Storage storage;
     private final TaskList taskList;
 
+    /**
+     * Creates a new Greg instance using the given data file path.
+     *
+     * @param filePath Path to the save file used for loading and saving tasks.
+     */
     public Greg(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
@@ -24,6 +35,12 @@ public class Greg {
         this.taskList = new TaskList(loadedTasks);
     }
 
+    /**
+     * Runs the main interaction loop.
+     * <p>
+     * Loads tasks from storage, repeatedly reads user input, parses it into commands,
+     * executes the command, updates the task list, and saves changes when applicable.
+     */
     public void run() {
         ui.showWelcome();
 

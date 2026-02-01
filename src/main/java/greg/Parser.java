@@ -1,7 +1,20 @@
 package greg;
 
+/**
+ * Parses raw user input into a structured command representation.
+ * <p>
+ * Converts strings such as "todo ...", "deadline ... /by ...", "mark 2" into
+ * {@link ParsedCommand} objects for downstream execution.
+ */
 public class Parser {
 
+    /**
+     * Parses a raw input line into a {@link ParsedCommand}.
+     *
+     * @param input Raw user input.
+     * @return Parsed command containing command type and extracted fields.
+     * @throws GregException If the input is not a valid command or is missing required parts.
+     */
     public static ParsedCommand parse(String input) throws GregException {
 
         if (input.equals("bye")) {
@@ -83,6 +96,13 @@ public class Parser {
         throw new GregException("Invalid command.");
     }
 
+    /**
+     * Extracts a 1-indexed task number from commands like "mark 2" or "delete 3".
+     *
+     * @param input Raw input string.
+     * @return Parsed task number (still 1-indexed).
+     * @throws GregException If the task number is missing or not a valid integer.
+     */
     private static int parseIndex(String input) throws GregException {
         try {
             return Integer.parseInt(input.split(" ")[1]);

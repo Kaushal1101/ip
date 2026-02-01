@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles loading tasks from disk and saving tasks to disk.
+ * <p>
+ * Tasks are stored line-by-line using each task's save-string representation.
+ */
 public class Storage {
     private final File file;
 
@@ -45,6 +50,11 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Ensures the save file exists by creating missing parent directories and the file itself.
+     *
+     * @throws GregException If the file cannot be created due to I/O errors.
+     */
     private void ensureFileExists() throws GregException {
         try {
             File parent = file.getParentFile();

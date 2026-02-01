@@ -3,6 +3,13 @@ package greg;
 import java.util.List;
 import java.util.Scanner;
 
+
+/**
+ * Handles all user-facing output for the Greg task manager.
+ * <p>
+ * This class is responsible only for formatting and printing messages, and does not
+ * contain command logic or data storage logic.
+ */
 public class Ui {
     private static final String LINE =
             "____________________________________________________________\n";
@@ -13,8 +20,6 @@ public class Ui {
         this.scanner = new Scanner(System.in);
     }
 
-    /* ========== INPUT ========== */
-
     public String readCommand() {
         return scanner.nextLine().trim();
     }
@@ -23,13 +28,9 @@ public class Ui {
         scanner.close();
     }
 
-    /* ========== COMMON FORMATTING ========== */
-
     public void showLine() {
         System.out.print(LINE);
     }
-
-    /* ========== STARTUP / EXIT ========== */
 
     public void showWelcome() {
         System.out.print(LINE);
@@ -43,8 +44,6 @@ public class Ui {
         System.out.println(" Bye. Hope to see you again soon!");
         System.out.print(LINE);
     }
-
-    /* ========== NORMAL RESPONSES ========== */
 
     public void showTaskAdded(Task task, int taskCount) {
         System.out.println("Got it. I've added this task: ");
@@ -72,8 +71,6 @@ public class Ui {
         System.out.print(LINE);
     }
 
-    /* ========== LIST OUTPUT ========== */
-
     public void showTaskList(List<Task> tasks) {
         for (int i = 0; i < tasks.size(); i++) {
             System.out.println((i + 1) + ". " + tasks.get(i).toString());
@@ -82,7 +79,6 @@ public class Ui {
         System.out.print(LINE);
     }
 
-    /* ========== FIND RESULTS ========= */
     public void showFindResults(List<Task> matches) {
         System.out.println(LINE);
         System.out.println("Here are the matching tasks in your list:");
@@ -92,7 +88,6 @@ public class Ui {
         System.out.println(LINE);
     }
 
-    /* ========== ERRORS / WARNINGS ========== */
 
     public void showError(String message) {
         System.out.println(message);
