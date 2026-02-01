@@ -17,8 +17,8 @@ public class Event extends Task {
      * Creates an event task.
      *
      * @param description Task description.
-     * @param fromRaw Raw start date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
-     * @param toRaw Raw end date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @param fromRaw     Raw start date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @param toRaw       Raw end date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
      * @throws GregException If description is empty or any date/time format is invalid.
      */
     public Event(String description, String fromRaw, String toRaw) throws GregException {

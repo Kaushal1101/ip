@@ -14,7 +14,7 @@ public class Deadline extends Task {
      * Creates a deadline task.
      *
      * @param description Task description.
-     * @param byRaw Raw date/time string provided by the user (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @param byRaw       Raw date/time string provided by the user (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
      * @throws GregException If the description is empty or date/time format is invalid.
      */
     public Deadline(String description, String byRaw) throws GregException {
