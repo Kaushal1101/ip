@@ -2,6 +2,10 @@ package greg;
 
 import java.time.LocalDate;
 
+
+/**
+ * A task that occurs over a date/time range, with optional times.
+ */
 public class Event extends Task {
 
     private LocalDate fromDate;
@@ -9,6 +13,14 @@ public class Event extends Task {
     private LocalDate toDate;
     private String toTime;
 
+    /**
+     * Creates an event task.
+     *
+     * @param description Task description.
+     * @param fromRaw Raw start date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @param toRaw Raw end date/time string (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @throws GregException If description is empty or any date/time format is invalid.
+     */
     public Event(String description, String fromRaw, String toRaw) throws GregException {
         super(description);
 

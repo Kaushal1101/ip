@@ -3,6 +3,12 @@ package greg;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Represents a task that can be stored in Greg.
+ * <p>
+ * A task has a description and a completion status. Subclasses add extra fields
+ * such as deadlines or event date ranges.
+ */
 public abstract class Task {
     protected String description;
     protected boolean marked;
@@ -48,8 +54,21 @@ public abstract class Task {
         throw new GregException("Invalid time format. Use HHmm (24-hour).");
     }
 
+    /**
+     * Returns the encoded representation of this task for saving to disk.
+     *
+     * @return Save string that can later be parsed back into a Task.
+     */
     public abstract String toSaveString();
 
+
+    /**
+     * Reconstructs a Task object from a single line in the save file.
+     *
+     * @param line Save file line.
+     * @return A Task corresponding to the encoded data in the line.
+     * @throws GregException If the line is corrupted or contains an unknown task type.
+     */
     public static Task fromSaveString(String line) throws GregException {
         String[] parts = line.split("\\s*\\|\\s*");
 

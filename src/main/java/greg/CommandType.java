@@ -1,5 +1,8 @@
 package greg;
 
+/**
+ * Represents the supported command categories in Greg.
+ */
 public enum CommandType {
     BYE,
     LIST,

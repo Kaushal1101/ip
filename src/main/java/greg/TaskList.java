@@ -3,11 +3,14 @@ package greg;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Maintains the in-memory list of tasks and provides task operations.
+ * <p>
+ * Responsible for add/delete/mark/unmark/find operations and for validating indices.
+ */
 public class TaskList {
 
     private final List<Task> tasks;
-
-    /* ========== CONSTRUCTORS ========== */
 
     public TaskList() {
         this.tasks = new ArrayList<>();
@@ -17,8 +20,6 @@ public class TaskList {
         this.tasks = tasks;
     }
 
-    /* ========== BASIC QUERIES ========== */
-
     public int size() {
         return tasks.size();
     }
@@ -26,8 +27,6 @@ public class TaskList {
     public List<Task> getAll() {
         return tasks;
     }
-
-    /* ========== MUTATIONS ========== */
 
     public void add(Task task) {
         tasks.add(task);
@@ -52,7 +51,6 @@ public class TaskList {
         return task;
     }
 
-    /* ========== INTERNAL HELPERS ========== */
 
     private int toZeroIndex(int oneIndexedIndex) throws GregException {
         int idx = oneIndexedIndex - 1;

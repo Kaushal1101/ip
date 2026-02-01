@@ -1,5 +1,12 @@
 package greg;
 
+/**
+ * A structured representation of a user command after parsing.
+ * <p>
+ * Fields are populated depending on the {@link CommandType}. For example:
+ * MARK/UNMARK/DELETE uses {@code index}, TODO uses {@code description},
+ * DEADLINE uses {@code description} + {@code byRaw}, EVENT uses {@code description} + {@code fromRaw} + {@code toRaw}.
+ */
 public class ParsedCommand {
     public CommandType type;
 

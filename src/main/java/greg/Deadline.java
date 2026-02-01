@@ -2,11 +2,21 @@ package greg;
 
 import java.time.LocalDate;
 
+/**
+ * A task that must be completed by a specific date (and optional time).
+ */
 public class Deadline extends Task {
 
     private LocalDate byDate;
     private String byTime;
 
+    /**
+     * Creates a deadline task.
+     *
+     * @param description Task description.
+     * @param byRaw Raw date/time string provided by the user (e.g., yyyy-mm-dd or yyyy-mm-dd HHmm).
+     * @throws GregException If the description is empty or date/time format is invalid.
+     */
     public Deadline(String description, String byRaw) throws GregException {
         super(description);
 
@@ -14,15 +24,6 @@ public class Deadline extends Task {
         this.byTime = parseOptionalTime(byRaw);
     }
 
-//    @Override
-//    public String toString() {
-//        return "[D]" + super.toString() + " (by: " + by + ")";
-//    }
-//
-//    @Override
-//    public String toSaveString() {
-//        return "D | " + (marked ? 1 : 0) + " | " + description + " | " + by;
-//    }
 
     @Override
     public String toString() {
