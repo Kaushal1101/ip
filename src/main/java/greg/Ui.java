@@ -1,100 +1,80 @@
 package greg;
 
 import java.util.List;
-import java.util.Scanner;
-
 
 /**
- * Handles all user-facing output for the Greg task manager.
+ * Provides user-facing messages for the Greg task manager.
  * <p>
- * This class is responsible only for formatting and printing messages, and does not
- * contain command logic or data storage logic.
+ * In the JavaFX version, this class does not read input or print output.
+ * It only formats messages and returns them as strings for the UI layer to display.
  */
 public class Ui {
+
     private static final String LINE =
-            "____________________________________________________________\n";
+            "____________________________________________________________";
 
-    private final Scanner scanner;
-
-    public Ui() {
-        this.scanner = new Scanner(System.in);
+    public String getWelcome() {
+        return "Hello! I'm Greg\n"
+                + "What can I do for you?";
     }
 
-    public String readCommand() {
-        return scanner.nextLine().trim();
+    public String getGoodbye() {
+        return LINE + "\n"
+                + "Bye. Hope to see you again soon!\n"
+                + LINE;
     }
 
-    public void close() {
-        scanner.close();
+    public String getTaskAdded(Task task, int taskCount) {
+        return "Got it. I've added this task:\n"
+                + task + "\n"
+                + "Now you have " + taskCount + " tasks in the list.";
     }
 
-    public void showLine() {
-        System.out.print(LINE);
+    public String getTaskDeleted(Task deletedTask, int taskCount) {
+        return "Noted. I've removed this task:\n"
+                + deletedTask + "\n"
+                + "Now you have " + taskCount + " tasks in the list.";
     }
 
-    public void showWelcome() {
-        System.out.print(LINE);
-        System.out.println("Hello! I'm Greg");
-        System.out.println("What can I do for you?");
-        System.out.print(LINE);
+    public String getTaskMarked(Task task) {
+        return "Nice! I've marked this task as done:\n"
+                + task;
     }
 
-    public void showGoodbye() {
-        System.out.print(LINE);
-        System.out.println(" Bye. Hope to see you again soon!");
-        System.out.print(LINE);
+    public String getTaskUnmarked(Task task) {
+        return "OK, I've marked this task as not done yet:\n"
+                + task;
     }
 
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task: ");
-        System.out.println(task.toString());
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        System.out.print(LINE);
-    }
+    public String getTaskList(List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            return "Your task list is empty.";
+        }
 
-    public void showTaskDeleted(String deletedTask, int taskCount) {
-        System.out.println("Noted. I've removed this task: ");
-        System.out.println(deletedTask);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        System.out.print(LINE);
-    }
-
-    public void showTaskMarked(Task task) {
-        System.out.println("Nice! I've marked this task as done: ");
-        System.out.println(task.toString());
-        System.out.print(LINE);
-    }
-
-    public void showTaskUnmarked(Task task) {
-        System.out.println(" OK, I've marked this task as not done yet: ");
-        System.out.println(task.toString());
-        System.out.print(LINE);
-    }
-
-    public void showTaskList(List<Task> tasks) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + tasks.get(i).toString());
+            sb.append(i + 1).append(". ").append(tasks.get(i)).append("\n");
         }
-        System.out.println();
-        System.out.print(LINE);
+        return sb.toString().trim();
     }
 
-    public void showFindResults(List<Task> matches) {
-        System.out.println(LINE);
-        System.out.println("Here are the matching tasks in your list:");
+    public String getFindResults(List<Task> matches) {
+        if (matches.isEmpty()) {
+            return "No matching tasks found.";
+        }
+
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
         for (int i = 0; i < matches.size(); i++) {
-            System.out.println((i + 1) + ". " + matches.get(i));
+            sb.append(i + 1).append(". ").append(matches.get(i)).append("\n");
         }
-        System.out.println(LINE);
+        return sb.toString().trim();
     }
 
-
-    public void showError(String message) {
-        System.out.println(message);
-        System.out.print(LINE);
+    public String getError(String message) {
+        return message;
     }
 
-    public void showWarning(String message) {
-        System.out.println("Warning: " + message);
+    public String getWarning(String message) {
+        return "Warning: " + message;
     }
 }
