@@ -1,4 +1,3 @@
-T | 0 | read book
-T | 0 | fart
-T | 0 | read something
 T | 0 | return book
+E | 0 | project meeting | 2026-05-14 | 1400 | 2026-05-14 | 1500
+T | 1 | blah

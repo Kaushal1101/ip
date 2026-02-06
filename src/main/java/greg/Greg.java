@@ -3,23 +3,14 @@ package greg;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entry point and main coordinator of the Greg task manager.
- * <p>
- * Wires together the UI, storage, task list, and parser, then runs the main command loop
- * until the user exits.
- */
 public class Greg {
 
     private final Ui ui;
     private final Storage storage;
     private final TaskList taskList;
 
-    /**
-     * Creates a new Greg instance using the given data file path.
-     *
-     * @param filePath Path to the save file used for loading and saving tasks.
-     */
+    private boolean isExit = false;
+
     public Greg(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
@@ -28,103 +19,84 @@ public class Greg {
         try {
             loadedTasks = storage.loadAll();
         } catch (GregException e) {
-            ui.showWarning(e.getMessage());
+            // In JavaFX, warnings should be returned as a message, not printed.
             loadedTasks = new ArrayList<>();
         }
 
         this.taskList = new TaskList(loadedTasks);
     }
 
-    /**
-     * Runs the main interaction loop.
-     * <p>
-     * Loads tasks from storage, repeatedly reads user input, parses it into commands,
-     * executes the command, updates the task list, and saves changes when applicable.
-     */
-    public void run() {
-        ui.showWelcome();
-
-        while (true) {
-            String input = ui.readCommand();
-            ui.showLine();
-
-            try {
-                ParsedCommand cmd = Parser.parse(input);
-
-                switch (cmd.type) {
-
-                    case BYE:
-                        storage.saveAll(taskList.getAll());
-                        ui.showGoodbye();
-                        ui.close();
-                        return;
-
-                    case LIST:
-                        ui.showTaskList(taskList.getAll());
-                        break;
-
-                    case MARK: {
-                        Task task = taskList.mark(cmd.index);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskMarked(task);
-                        break;
-                    }
-
-                    case UNMARK: {
-                        Task task = taskList.unmark(cmd.index);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskUnmarked(task);
-                        break;
-                    }
-
-                    case DELETE: {
-                        Task task = taskList.delete(cmd.index);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskDeleted(task.toString(), taskList.size());
-                        break;
-                    }
-
-                    case TODO: {
-                        Task task = new Todo(cmd.description);
-                        taskList.add(task);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskAdded(task, taskList.size());
-                        break;
-                    }
-
-                    case DEADLINE: {
-                        Task task = new Deadline(cmd.description, cmd.byRaw);
-                        taskList.add(task);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskAdded(task, taskList.size());
-                        break;
-                    }
-
-                    case EVENT: {
-                        Task task = new Event(cmd.description, cmd.fromRaw, cmd.toRaw);
-                        taskList.add(task);
-                        storage.saveAll(taskList.getAll());
-                        ui.showTaskAdded(task, taskList.size());
-                        break;
-                    }
-
-                    case FIND: {
-                        List<Task> matches = taskList.find(cmd.description);
-                        ui.showFindResults(matches);
-                        break;
-                    }
-
-                    default:
-                        throw new GregException("Unknown command.");
-
-                }
-            } catch (GregException e) {
-                ui.showError(e.getMessage());
-            }
-        }
+    public String getWelcomeMessage() {
+        return ui.getWelcome();
     }
 
-    public static void main(String[] args) {
-        new Greg("data/greg.txt").run();
+    public boolean isExit() {
+        return isExit;
+    }
+
+    public String getResponse(String input) {
+        try {
+            ParsedCommand cmd = Parser.parse(input);
+
+            switch (cmd.type) {
+                case BYE:
+                    storage.saveAll(taskList.getAll());
+                    isExit = true;
+                    return ui.getGoodbye();
+
+                case LIST:
+                    return ui.getTaskList(taskList.getAll());
+
+                case MARK: {
+                    Task task = taskList.mark(cmd.index);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskMarked(task);
+                }
+
+                case UNMARK: {
+                    Task task = taskList.unmark(cmd.index);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskUnmarked(task);
+                }
+
+                case DELETE: {
+                    Task task = taskList.delete(cmd.index);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskDeleted(task, taskList.size());
+                }
+
+                case TODO: {
+                    Task task = new Todo(cmd.description);
+                    taskList.add(task);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskAdded(task, taskList.size());
+                }
+
+                case DEADLINE: {
+                    Task task = new Deadline(cmd.description, cmd.byRaw);
+                    taskList.add(task);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskAdded(task, taskList.size());
+                }
+
+                case EVENT: {
+                    Task task = new Event(cmd.description, cmd.fromRaw, cmd.toRaw);
+                    taskList.add(task);
+                    storage.saveAll(taskList.getAll());
+                    return ui.getTaskAdded(task, taskList.size());
+                }
+
+                case FIND: {
+                    List<Task> matches = taskList.find(cmd.description);
+                    return ui.getFindResults(matches);
+                }
+
+                default:
+                    throw new GregException("Unknown command.");
+            }
+
+        } catch (GregException e) {
+            return ui.getError(e.getMessage());
+        }
     }
 }
