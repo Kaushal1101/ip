@@ -22,6 +22,8 @@ public class Greg {
      * @param filePath path to the save file used for loading and saving tasks.
      */
     public Greg(String filePath) {
+        assert filePath != null && !filePath.isBlank() : "filePath must not be blank";
+
         this.ui = new Ui();
         this.storage = new Storage(filePath);
 
@@ -61,8 +63,11 @@ public class Greg {
      * @return response string for the UI to display
      */
     public String getResponse(String input) {
+        assert input != null : "input should not be null";
+
         try {
             ParsedCommand cmd = parse(input);
+            assert cmd != null && cmd.type != null : "Parser must return a command with a type"; // Assert code from merge 
             return execute(cmd);
         } catch (GregException e) {
             return ui.getError(e.getMessage());
@@ -122,18 +127,21 @@ public class Greg {
     }
 
     private String handleMark(int index) throws GregException {
+        assert index > 0 : "index should be positive";
         Task task = taskList.mark(index);
         save();
         return ui.getTaskMarked(task);
     }
 
     private String handleUnmark(int index) throws GregException {
+        assert index > 0 : "index should be positive";
         Task task = taskList.unmark(index);
         save();
         return ui.getTaskUnmarked(task);
     }
 
     private String handleDelete(int index) throws GregException {
+        assert index > 0 : "index should be positive";
         Task task = taskList.delete(index);
         save();
         return ui.getTaskDeleted(task, taskList.size());
