@@ -1,117 +1,139 @@
 package greg;
 
-/**
- * Parses raw user input into a structured command representation.
- * <p>
- * Converts strings such as "todo ...", "deadline ... /by ...", "mark 2" into
- * {@link ParsedCommand} objects for downstream execution.
- */
 public class Parser {
 
-    /**
-     * Parses a raw input line into a {@link ParsedCommand}.
-     *
-     * @param input Raw user input.
-     * @return Parsed command containing command type and extracted fields.
-     * @throws GregException If the input is not a valid command or is missing required parts.
-     */
+    private static final String INVALID_COMMAND = "Invalid command.";
+
+    private static final String DEADLINE_FORMAT =
+            "Invalid deadline format. Use: deadline <desc> /by yyyy-mm-dd [HHmm]";
+    private static final String EVENT_FORMAT =
+            "Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]";
+
+    private static final int SPLIT_TWO = 2;
+
+
     public static ParsedCommand parse(String input) throws GregException {
+        if (input == null) throw new GregException(INVALID_COMMAND);
 
-        if (input.equals("bye")) {
-            return new ParsedCommand(CommandType.BYE);
+        input = input.trim();
+        if (input.isEmpty()) throw new GregException(INVALID_COMMAND);
+
+        String[] parts = input.split("\\s+", SPLIT_TWO);
+        String keyword = parts[0];
+        String rest = parts.length == 2 ? parts[1].trim() : "";
+
+        switch (keyword) {
+            case "bye":
+                return new ParsedCommand(CommandType.BYE);
+
+            case "list":
+                return new ParsedCommand(CommandType.LIST);
+
+            case "mark":
+                return parseIndexed(CommandType.MARK, rest);
+
+            case "unmark":
+                return parseIndexed(CommandType.UNMARK, rest);
+
+            case "delete":
+                return parseIndexed(CommandType.DELETE, rest);
+
+            case "todo":
+                return parseTextCommand(CommandType.TODO, rest, "Todo must have a description.");
+
+            case "find":
+                return parseTextCommand(CommandType.FIND, rest, "Find command must have a search term.");
+
+            case "deadline":
+                return parseDeadline(rest);
+
+            case "event":
+                return parseEvent(rest);
+
+            case "help":
+                return new ParsedCommand(CommandType.HELP);
+
+            default:
+                throw new GregException(INVALID_COMMAND);
         }
-
-        if (input.equals("list")) {
-            return new ParsedCommand(CommandType.LIST);
-        }
-
-        if (input.startsWith("mark ")) {
-            ParsedCommand cmd = new ParsedCommand(CommandType.MARK);
-            cmd.index = parseIndex(input);
-            return cmd;
-        }
-
-        if (input.startsWith("unmark ")) {
-            ParsedCommand cmd = new ParsedCommand(CommandType.UNMARK);
-            cmd.index = parseIndex(input);
-            return cmd;
-        }
-
-        if (input.startsWith("delete ")) {
-            ParsedCommand cmd = new ParsedCommand(CommandType.DELETE);
-            cmd.index = parseIndex(input);
-            return cmd;
-        }
-
-        if (input.startsWith("todo ")) {
-            ParsedCommand cmd = new ParsedCommand(CommandType.TODO);
-            cmd.description = input.substring(5).trim();
-            return cmd;
-        }
-
-        if (input.startsWith("deadline ")) {
-            String rest = input.substring(9).trim();
-            String[] parts = rest.split("/by", 2);
-
-            if (parts.length < 2) {
-                throw new GregException("Invalid deadline format. Use: deadline <desc> /by yyyy-mm-dd [HHmm]");
-            }
-
-            ParsedCommand cmd = new ParsedCommand(CommandType.DEADLINE);
-            cmd.description = parts[0].trim();
-            cmd.byRaw = parts[1].trim();
-            return cmd;
-        }
-
-        if (input.startsWith("event ")) {
-            String rest = input.substring(6).trim();
-            String[] fromSplit = rest.split("/from", 2);
-
-            if (fromSplit.length < 2) {
-                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
-            }
-
-            String[] toSplit = fromSplit[1].trim().split("/to", 2);
-            if (toSplit.length < 2) {
-                throw new GregException("Invalid event format. Use: event <desc> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]");
-            }
-
-            ParsedCommand cmd = new ParsedCommand(CommandType.EVENT);
-            cmd.description = fromSplit[0].trim();
-            cmd.fromRaw = toSplit[0].trim();
-            cmd.toRaw = toSplit[1].trim();
-            return cmd;
-        }
-
-        if (input.startsWith("find ")) {
-            String query = input.substring(5).trim();
-            if (query.isEmpty()) {
-                throw new GregException("Find command must have a search term.");
-            }
-            ParsedCommand cmd = new ParsedCommand(CommandType.FIND);
-            cmd.description = query;   // reuse description field
-            return cmd;
-        }
-
-        if (input.startsWith("help")) {
-            return new ParsedCommand(CommandType.HELP);
-        }
-
-        throw new GregException("Invalid command.");
     }
 
-    /**
-     * Extracts a 1-indexed task number from commands like "mark 2" or "delete 3".
-     *
-     * @param input Raw input string.
-     * @return Parsed task number (still 1-indexed).
-     * @throws GregException If the task number is missing or not a valid integer.
-     */
-    private static int parseIndex(String input) throws GregException {
+    private static ParsedCommand parseIndexed(CommandType type, String rest) throws GregException {
+        String arg = requireRest(rest, "Invalid task number.");
+
         try {
-            return Integer.parseInt(input.split(" ")[1]);
-        } catch (Exception e) {
+            int index = Integer.parseInt(arg);
+            ParsedCommand cmd = new ParsedCommand(type);
+            cmd.index = index;
+            return cmd;
+        } catch (NumberFormatException e) {
             throw new GregException("Invalid task number.");
         }
+    }
+
+    private static ParsedCommand parseTextCommand(CommandType type, String rest, String emptyMsg) throws GregException {
+        String text = requireRest(rest, emptyMsg);
+
+        ParsedCommand cmd = new ParsedCommand(type);
+        cmd.description = text; // works for TODO and FIND (FIND reuses description)
+        return cmd;
+    }
+
+    private static ParsedCommand parseDeadline(String rest) throws GregException {
+        String body = requireRest(rest, DEADLINE_FORMAT);
+
+        String[] split = splitRequired(body, "/by", DEADLINE_FORMAT);
+
+        String desc = requireNonEmpty(split[0], DEADLINE_FORMAT);
+        String byRaw = requireNonEmpty(split[1], DEADLINE_FORMAT);
+
+        ParsedCommand cmd = new ParsedCommand(CommandType.DEADLINE);
+        cmd.description = desc;
+        cmd.byRaw = byRaw;
+        return cmd;
+    }
+
+    private static ParsedCommand parseEvent(String rest) throws GregException {
+        String body = requireRest(rest, EVENT_FORMAT);
+
+        String[] fromSplit = splitRequired(body, "/from", EVENT_FORMAT);
+        String desc = requireNonEmpty(fromSplit[0], EVENT_FORMAT);
+
+        String[] toSplit = splitRequired(fromSplit[1], "/to", EVENT_FORMAT);
+        String fromRaw = requireNonEmpty(toSplit[0], EVENT_FORMAT);
+        String toRaw = requireNonEmpty(toSplit[1], EVENT_FORMAT);
+
+        ParsedCommand cmd = new ParsedCommand(CommandType.EVENT);
+        cmd.description = desc;
+        cmd.fromRaw = fromRaw;
+        cmd.toRaw = toRaw;
+        return cmd;
+    }
+
+    // ---- Common helpers ----
+
+    private static String requireRest(String rest, String errorMsg) throws GregException {
+        if (rest == null || rest.trim().isEmpty()) {
+            throw new GregException(errorMsg);
+        }
+        return rest.trim();
+    }
+
+    private static String requireNonEmpty(String s, String errorMsg) throws GregException {
+        if (s == null || s.trim().isEmpty()) {
+            throw new GregException(errorMsg);
+        }
+        return s.trim();
+    }
+
+    private static String[] splitRequired(String text, String delimiter, String errorMsg) throws GregException {
+        String[] split = text.split(delimiter, SPLIT_TWO);
+        if (split.length < 2) {
+            throw new GregException(errorMsg);
+        }
+        // Trim both sides early so callers don't forget
+        split[0] = split[0].trim();
+        split[1] = split[1].trim();
+        return split;
     }
 }
