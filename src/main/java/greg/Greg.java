@@ -107,6 +107,9 @@ public class Greg {
             case FIND:
                 return handleFind(cmd.description);
 
+            case HELP:
+                return ui.getHelp();
+
             default:
                 throw new GregException("Unknown command.");
         }

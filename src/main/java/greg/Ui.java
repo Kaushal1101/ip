@@ -70,6 +70,46 @@ public class Ui {
         return sb.toString().trim();
     }
 
+    /**
+     * Returns the help message listing all available commands.
+     *
+     * @return formatted help message
+     */
+    public String getHelp() {
+        return """
+            Available commands:
+              list
+                - Displays all tasks.
+            
+              todo <description>
+                - Adds a todo task.
+            
+              deadline <description> /by yyyy-mm-dd [HHmm]
+                - Adds a task with a deadline.
+            
+              event <description> /from yyyy-mm-dd [HHmm] /to yyyy-mm-dd [HHmm]
+                - Adds an event task.
+            
+              mark <task number>
+                - Marks a task as done.
+            
+              unmark <task number>
+                - Marks a task as not done.
+            
+              delete <task number>
+                - Deletes a task.
+            
+              find <keyword>
+                - Finds tasks containing the keyword.
+            
+              help
+                - Shows this help message.
+            
+              bye
+                - Exits the application.
+            """;
+    }
+
     public String getError(String message) {
         return message;
     }

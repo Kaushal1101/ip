@@ -50,6 +50,9 @@ public class Parser {
             case "event":
                 return parseEvent(rest);
 
+            case "help":
+                return new ParsedCommand(CommandType.HELP);
+
             default:
                 throw new GregException(INVALID_COMMAND);
         }
