@@ -99,6 +99,10 @@ public class Greg {
                     return ui.getFindResults(matches);
                 }
 
+                case HELP: {
+                    return ui.getHelp();
+                }
+
                 default:
                     throw new GregException("Unknown command.");
             }
