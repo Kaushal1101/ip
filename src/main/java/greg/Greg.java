@@ -12,6 +12,8 @@ public class Greg {
     private boolean isExit = false;
 
     public Greg(String filePath) {
+        assert filePath != null && !filePath.isBlank() : "filePath must not be blank";
+
         this.ui = new Ui();
         this.storage = new Storage(filePath);
 
@@ -35,8 +37,11 @@ public class Greg {
     }
 
     public String getResponse(String input) {
+        assert input != null : "input should not be null";
+
         try {
             ParsedCommand cmd = Parser.parse(input);
+            assert cmd != null && cmd.type != null : "Parser must return a command with a type";
 
             switch (cmd.type) {
                 case BYE:
@@ -48,18 +53,21 @@ public class Greg {
                     return ui.getTaskList(taskList.getAll());
 
                 case MARK: {
+                    assert cmd.index > 0 : "index should be positive";
                     Task task = taskList.mark(cmd.index);
                     storage.saveAll(taskList.getAll());
                     return ui.getTaskMarked(task);
                 }
 
                 case UNMARK: {
+                    assert cmd.index > 0 : "index should be positive";
                     Task task = taskList.unmark(cmd.index);
                     storage.saveAll(taskList.getAll());
                     return ui.getTaskUnmarked(task);
                 }
 
                 case DELETE: {
+                    assert cmd.index > 0 : "index should be positive";
                     Task task = taskList.delete(cmd.index);
                     storage.saveAll(taskList.getAll());
                     return ui.getTaskDeleted(task, taskList.size());

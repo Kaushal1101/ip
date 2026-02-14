@@ -14,6 +14,7 @@ public abstract class Task {
     protected boolean marked;
 
     public Task(String description) {
+        assert description != null : "Task description should not be null";
         this.description = description;
         this.marked = false;
     }
@@ -32,6 +33,7 @@ public abstract class Task {
     }
 
     protected static LocalDate parseDate(String raw) throws GregException {
+        assert raw != null : "raw date string should not be null";
         String[] parts = raw.trim().split("\\s+");
         try {
             return LocalDate.parse(parts[0]); // yyyy-mm-dd
@@ -41,6 +43,7 @@ public abstract class Task {
     }
 
     protected static String parseOptionalTime(String raw) throws GregException {
+        assert raw != null : "raw time string should not be null";
         String[] parts = raw.trim().split("\\s+");
 
         if (parts.length == 1) {
@@ -61,7 +64,6 @@ public abstract class Task {
      */
     public abstract String toSaveString();
 
-
     /**
      * Reconstructs a Task object from a single line in the save file.
      *
@@ -70,8 +72,9 @@ public abstract class Task {
      * @throws GregException If the line is corrupted or contains an unknown task type.
      */
     public static Task fromSaveString(String line) throws GregException {
-        String[] parts = line.split("\\s*\\|\\s*");
+        assert line != null : "save line should not be null";
 
+        String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 3) {
             throw new GregException("Corrupted save line.");
         }
