@@ -9,12 +9,20 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * A dialog box consisting of an ImageView to represent the speaker
  * and a label containing text from the speaker.
  */
 public class DialogBox extends HBox {
+
+    private static final String FXML_PATH = "/view/DialogBox.fxml";
+    private static final String USER_IMAGE_PATH = "/images/User.png";
+    private static final String GREG_IMAGE_PATH = "/images/Greg.png";
+
+    private static final Image USER_IMAGE = loadImage(USER_IMAGE_PATH);
+    private static final Image GREG_IMAGE = loadImage(GREG_IMAGE_PATH);
 
     @FXML
     private Label dialog;
@@ -23,38 +31,55 @@ public class DialogBox extends HBox {
     private ImageView displayPicture;
 
     private DialogBox(String text, Image img) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
-            fxmlLoader.setController(this);
-            fxmlLoader.setRoot(this);
-            fxmlLoader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        loadFxml();
         dialog.setText(text);
         displayPicture.setImage(img);
     }
 
     /**
      * Creates a dialog box for the user.
+     *
+     * @param text user message
+     * @return dialog box aligned to the right
      */
     public static DialogBox getUserDialog(String text) {
-        Image userImage = new Image(
-                DialogBox.class.getResourceAsStream("/images/User.png"));
-        DialogBox box = new DialogBox(text, userImage);
-        box.setAlignment(Pos.TOP_RIGHT);
-        return box;
+        return create(text, USER_IMAGE, Pos.TOP_RIGHT);
     }
 
     /**
      * Creates a dialog box for Greg.
+     *
+     * @param text Greg message
+     * @return dialog box aligned to the left
      */
     public static DialogBox getGregDialog(String text) {
-        Image gregImage = new Image(
-                DialogBox.class.getResourceAsStream("/images/Greg.png"));
-        DialogBox box = new DialogBox(text, gregImage);
-        box.setAlignment(Pos.TOP_LEFT);
+        return create(text, GREG_IMAGE, Pos.TOP_LEFT);
+    }
+
+    private static DialogBox create(String text, Image image, Pos alignment) {
+        DialogBox box = new DialogBox(text, image);
+        box.setAlignment(alignment);
         return box;
+    }
+
+    private void loadFxml() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
+                    DialogBox.class.getResource(FXML_PATH),
+                    "Missing FXML: " + FXML_PATH
+            ));
+            loader.setController(this);
+            loader.setRoot(this);
+            loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load FXML: " + FXML_PATH, e);
+        }
+    }
+
+    private static Image loadImage(String path) {
+        return new Image(Objects.requireNonNull(
+                DialogBox.class.getResourceAsStream(path),
+                "Missing image: " + path
+        ));
     }
 }
