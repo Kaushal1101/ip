@@ -10,7 +10,7 @@ public class Todo extends Task {
      *
      * @param description task description
      */
-    public Todo(String description) {
+    public Todo(String description) throws GregException{
         super(description);
     }
 
