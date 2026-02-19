@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import greg.model.Event;
+import greg.exception.GregException;
+
 public class EventTest {
 
     @Test

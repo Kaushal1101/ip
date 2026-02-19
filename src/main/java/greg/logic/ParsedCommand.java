@@ -1,4 +1,4 @@
-package greg;
+package greg.logic;
 
 /**
  * A structured representation of a user command after parsing.

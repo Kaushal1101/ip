@@ -1,7 +1,10 @@
-package greg;
+package greg.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import greg.exception.GregException;
+import greg.model.Todo;
 
 /**
  * Represents a task that can be stored in Greg.

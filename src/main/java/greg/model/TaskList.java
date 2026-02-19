@@ -1,8 +1,10 @@
-package greg;
+package greg.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import greg.exception.GregException;
 
 /**
  * Maintains the in-memory list of tasks and provides task operations.

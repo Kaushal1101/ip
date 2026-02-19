@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import greg.logic.ParsedCommand;
+import greg.logic.Parser;
+import greg.logic.CommandType;
+import greg.exception.GregException;
+
 public class ParserTest {
 
     @Test

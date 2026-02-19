@@ -1,6 +1,8 @@
-package greg;
+package greg.ui;
 
 import java.util.List;
+
+import greg.model.Task;
 
 /**
  * Provides user-facing messages for the Greg task manager.

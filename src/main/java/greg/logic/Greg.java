@@ -1,4 +1,13 @@
-package greg;
+package greg.logic;
+
+import greg.exception.GregException;
+import greg.storage.Storage;
+import greg.model.TaskList;
+import greg.ui.Ui;
+import greg.model.Task;
+import greg.model.Event;
+import greg.model.Todo;
+import greg.model.Deadline;
 
 import java.util.ArrayList;
 import java.util.List;

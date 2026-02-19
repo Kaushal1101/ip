@@ -1,4 +1,7 @@
-package greg;
+package greg.model;
+
+import greg.model.Task;
+import greg.exception.GregException;
 
 /**
  * A basic task that only stores a description and completion status.

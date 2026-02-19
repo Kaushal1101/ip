@@ -1,4 +1,6 @@
-package greg;
+package greg.logic;
+
+import greg.exception.GregException;
 
 /**
  * Parses raw user input into a structured command representation.
@@ -105,7 +107,7 @@ public class Parser {
      */
     private static int parseIndex(String input) throws GregException {
         try {
-            return Integer.parseInt(input.split(" ")[1]);
+            return Integer.parseInt(input.split("\\s+")[1]);
         } catch (Exception e) {
             throw new GregException("Invalid task number.");
         }

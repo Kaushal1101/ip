@@ -1,10 +1,12 @@
-package greg;
+package greg.ui;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+
+import greg.logic.Greg;
 
 /**
  * Controller for MainWindow.fxml.

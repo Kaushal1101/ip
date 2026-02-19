@@ -1,4 +1,4 @@
-package greg;
+package greg.exception;
 
 /**
  * Represents a user-facing error encountered in Greg.

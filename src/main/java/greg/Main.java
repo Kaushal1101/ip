@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import greg.logic.Greg;
+import greg.ui.MainWindow;
+
 /**
  * Entry point of the JavaFX app.
  * Loads the main window from FXML and shows it.

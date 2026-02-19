@@ -1,4 +1,4 @@
-package greg;
+package greg.logic;
 
 /**
  * Represents the supported command categories in Greg.

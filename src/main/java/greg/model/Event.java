@@ -1,6 +1,8 @@
-package greg;
+package greg.model;
 
 import java.time.LocalDate;
+
+import greg.exception.GregException;
 
 /**
  * A task that occurs over a date/time range, with optional times.

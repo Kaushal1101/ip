@@ -1,6 +1,8 @@
-package greg;
+package greg.model;
 
 import java.time.LocalDate;
+
+import greg.exception.GregException;
 
 /**
  * A task that must be completed by a specific date (and optional time).
