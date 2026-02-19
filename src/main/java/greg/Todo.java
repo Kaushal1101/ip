@@ -8,8 +8,7 @@ public class Todo extends Task {
     /**
      * Creates a todo task.
      *
-     * @param description Description of the todo.
-     * @throws GregException If the description is empty.
+     * @param description task description
      */
     public Todo(String description) {
         super(description);
@@ -20,9 +19,10 @@ public class Todo extends Task {
         return "[T]" + super.toString();
     }
 
-
     @Override
     public String toSaveString() {
-        return "T | " + (marked ? 1 : 0) + " | " + description;
+        // T | done | desc
+        return "T | " + (marked ? 1 : 0)
+                + " | " + description;
     }
 }
