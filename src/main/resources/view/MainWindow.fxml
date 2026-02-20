@@ -10,7 +10,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="greg.MainWindow">
+            fx:controller="greg.ui.MainWindow">
 
     <children>
         <VBox prefHeight="600.0" prefWidth="400.0" AnchorPane.topAnchor="0.0"
