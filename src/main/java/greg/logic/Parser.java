@@ -95,6 +95,10 @@ public class Parser {
             return cmd;
         }
 
+        if (input.startsWith("help")) {
+            return new ParsedCommand(CommandType.HELP);
+        }
+
         throw new GregException("Invalid command.");
     }
 
